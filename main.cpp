@@ -1,22 +1,39 @@
-#include <functional>
+
+#include <boost/signals2/signal.hpp>
 #include <iostream>
-#include <memory>
 #include <opencv2/core.hpp>
 #include <opencv2/core/mat.hpp>
+#include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
-#include <string>
 
 #include "IInference.hpp"
 #include "streamer.hpp"
 #include "torchInference.hpp"
 
 int main(int argc, char *argv[]) {
-  std::function<cv::Mat()> cb;
-  Streamer streamer(argc, argv, 5000, 1, cb);
+#ifdef APP_VERSION
+  std::cout << APP_VERSION << std::endl;
+#endif
+
+  // create the inferencer
+  std::unique_ptr<IInference> inferencer =
+      std::make_unique<TorchInference>("best.torchscript", "");
+
+  // create the streamer to get images from the clients
+  Streamer streamer(argc, argv, 5000, 1);
   streamer.Setup();
+
+  // connect to the new image signal from the client
+  streamer.new_img.connect([&inferencer](cv::Mat img) {
+    // get the model results for the image (model inferencing has a lot of
+    // errors)
+    inferencer->Infer(img);
+    // TODO use the results in an alert system
+  });
+
+  // start the streamer
   streamer.Start();
-  // std::unique_ptr<IInference> inferencer =
-  //   std::make_unique<TorchInference>("", "");
+
   return 0;
 }

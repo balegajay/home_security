@@ -1,10 +1,35 @@
 cmake_minimum_required(VERSION 3.19.0)
 project(home_security VERSION 0.1.0 LANGUAGES C CXX)
 
+add_executable(${PROJECT_NAME} main.cpp)
+##set this to the linker flag so that the exe looks for so files in the current dir
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath='$ORIGIN'")
+
+####################################################################################################
+##install
+set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install)
+install(TARGETS ${PROJECT_NAME})
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/detector/models/ DESTINATION bin)
+
+###################################################################################################################
+##dependencies
+
+find_package(OpenCV REQUIRED)
+
+set(TORCH_DIR ${CMAKE_SOURCE_DIR}/deps/torch/)
+file(ARCHIVE_EXTRACT INPUT ${TORCH_DIR}/libtorch-cxx11-abi-shared-with-deps-latest.zip DESTINATION ${TORCH_DIR})
+
+find_package(Torch REQUIRED PATHS ${TORCH_DIR}/libtorch/share/cmake/Torch)
+
+target_include_directories(${PROJECT_NAME} PUBLIC ${OpenCV_INCLUDE_DIRS} ${TORCH_INCLUDE_DIRS})
+
+target_link_libraries(${PROJECT_NAME} PUBLIC ${OpenCV_LIBS} Inference streamer)
+
+####################################################################################################
+##sub projects
 add_subdirectory(detector/inference)
 add_subdirectory(communication)
 
-add_executable(${PROJECT_NAME} main.cpp)
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 
 ##################################################################################################################
@@ -43,18 +68,6 @@ endif()
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC GLIBCXX_USE_CXX17_ABI=0 APP_VERSION="${APP_VERSION}_${COMMIT_COUNT}_${COMMIT_DATE}")
 
-
-###################################################################################################################
-##dependencies
-
-find_package(OpenCV REQUIRED)
-set(TORCH_DIR ${CMAKE_SOURCE_DIR}/deps/torch/)
-find_package(Torch REQUIRED PATHS ${TORCH_DIR}/libtorch/share/cmake/Torch)
-
-target_include_directories(${PROJECT_NAME} PUBLIC ${OpenCV_INCLUDE_DIRS} ${TORCH_INCLUDE_DIRS})
-
-target_link_libraries(${PROJECT_NAME} PUBLIC ${OpenCV_LIBS} Inference streamer)
-
 ####################################################################################################
 ##test
 include(CTest)
@@ -64,6 +77,9 @@ enable_testing()
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
+
+######################################################################################################
+##playground
 
 add_executable(play playground.c)
 find_package(PkgConfig REQUIRED)
@@ -80,3 +96,4 @@ target_link_libraries(play
     PkgConfig::gstreamer-app
     PkgConfig::gstreamer-video
 )
+
