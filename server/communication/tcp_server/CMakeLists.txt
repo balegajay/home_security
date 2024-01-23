@@ -4,7 +4,7 @@ project(tcp_server VERSION 0.1.0 LANGUAGES CXX)
 include(CTest)
 enable_testing()
 
-add_library(${PROJECT_NAME} tcp_server.cpp tcp_server.hpp)
+add_library(${PROJECT_NAME} tcp_server.cpp session.cpp session_manager.cpp)
 
 ####################################################################################################
 ##dependencies
