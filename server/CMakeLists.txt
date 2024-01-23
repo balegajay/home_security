@@ -20,7 +20,12 @@ file(ARCHIVE_EXTRACT INPUT ${TORCH_DIR}/libtorch-cxx11-abi-shared-with-deps-late
 
 find_package(Torch REQUIRED PATHS ${TORCH_DIR}/libtorch/share/cmake/Torch)
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${OpenCV_INCLUDE_DIRS} ${TORCH_INCLUDE_DIRS})
+set(Boost_USE_STATIC_LIBS OFF) 
+set(Boost_USE_MULTITHREADED ON)  
+set(Boost_USE_STATIC_RUNTIME OFF) 
+find_package(Boost REQUIRED) 
+
+target_include_directories(${PROJECT_NAME} PUBLIC ${OpenCV_INCLUDE_DIRS} ${TORCH_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${OpenCV_LIBS} Inference streamer)
 
