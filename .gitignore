@@ -2,4 +2,4 @@ build/
 .cache/
 install/
 .vscode/
-deps/torch/libtorch/
+server/deps/torch/libtorch/
