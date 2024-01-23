@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.19.0)
-project(home_security VERSION 0.1.0 LANGUAGES C CXX)
+project(server VERSION 0.1.0 LANGUAGES C CXX)
 
 add_executable(${PROJECT_NAME} main.cpp)
 ##set this to the linker flag so that the exe looks for so files in the current dir
@@ -7,16 +7,15 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath='$ORIGIN'")
 
 ####################################################################################################
 ##install
-set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install)
 install(TARGETS ${PROJECT_NAME})
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/detector/models/ DESTINATION bin)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/detector/models/ DESTINATION bin)
 
 ###################################################################################################################
 ##dependencies
 
 find_package(OpenCV REQUIRED)
 
-set(TORCH_DIR ${CMAKE_SOURCE_DIR}/deps/torch/)
+set(TORCH_DIR ${CMAKE_CURRENT_SOURCE_DIR}/deps/torch/)
 file(ARCHIVE_EXTRACT INPUT ${TORCH_DIR}/libtorch-cxx11-abi-shared-with-deps-latest.zip DESTINATION ${TORCH_DIR})
 
 find_package(Torch REQUIRED PATHS ${TORCH_DIR}/libtorch/share/cmake/Torch)
@@ -77,23 +76,4 @@ enable_testing()
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
-
-######################################################################################################
-##playground
-
-add_executable(play playground.c)
-find_package(PkgConfig REQUIRED)
-#pkg_check_modules(gtk3 REQUIRED IMPORTED_TARGET gtk+-3.0)
-pkg_search_module(gstreamer REQUIRED IMPORTED_TARGET gstreamer-1.0>=1.4)
-pkg_search_module(gstreamer-sdp REQUIRED IMPORTED_TARGET gstreamer-sdp-1.0>=1.4)
-pkg_search_module(gstreamer-app REQUIRED IMPORTED_TARGET gstreamer-app-1.0>=1.4)
-pkg_search_module(gstreamer-video REQUIRED IMPORTED_TARGET gstreamer-video-1.0>=1.4)
-
-target_link_libraries(play
- #   PkgConfig::gtk3
-    PkgConfig::gstreamer
-    PkgConfig::gstreamer-sdp
-    PkgConfig::gstreamer-app
-    PkgConfig::gstreamer-video
-)
 
