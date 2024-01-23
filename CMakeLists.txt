@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.19.0)
-project(server VERSION 0.1.0 LANGUAGES C CXX)
+project(home_security VERSION 0.1.0 LANGUAGES C CXX)
 
 ####################################################################################################
 ##install
