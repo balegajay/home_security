@@ -1,0 +1,33 @@
+namespace Communication;
+
+struct Sensor {
+    new_object: bool;
+}
+
+enum Status:byte {
+    Start=0, Stop
+}
+
+struct Camera {
+    status:Status;
+}
+
+enum ResponseContent:byte {
+    OK=0, ERROR=1
+}
+
+struct Response {
+    value: ResponseContent;
+}
+
+union Content {
+ sensor: Sensor,
+ camera: Camera,
+ response: Response
+} 
+
+table Message {
+ content: Content;
+}
+
+root_type Message;
