@@ -5,7 +5,9 @@
 #include <vector>
 
 TCPServer::TCPServer(uint16_t port)
-    : io_context_(), acceptor_(io_context_, tcp::endpoint(tcp::v4(), port)) {}
+    : io_context_(),
+      acceptor_(io_context_, tcp::endpoint(tcp::v4(), port)),
+      session_manager_(io_context_) {}
 
 TCPServer::~TCPServer() {}
 

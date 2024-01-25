@@ -15,9 +15,9 @@ class TCPServer {
   void StartAsync();
 
  private:
-  void StartAccept();
   boost::asio::io_context io_context_;
   tcp::acceptor acceptor_;
-  bool running_ = false;
   SessionManager session_manager_;
+  void StartAccept();
+  bool running_ = false;
 };
