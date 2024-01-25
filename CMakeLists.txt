@@ -1,5 +1,23 @@
 cmake_minimum_required(VERSION 3.19.0)
 project(home_security VERSION 0.1.0 LANGUAGES C CXX)
+include(cmake/fetchFlatBuffers.cmake)
+
+####################################################################################################
+##dependencies
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/fbs_generated)
+
+set(flatc_command ${FLATC_DIR} --cpp ${CMAKE_SOURCE_DIR}/fb/message.fbs)
+
+execute_process(
+    COMMAND ${flatc_command}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/fbs_generated
+    RESULT_VARIABLE result
+)
+if(result EQUAL 0)
+    message("FlatBuffers schema compilation succeeded.")
+else()
+    message(FATAL_ERROR "FlatBuffers schema compilation failed with result: ${result}")
+endif()
 
 ####################################################################################################
 ##install
@@ -8,6 +26,7 @@ set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install)
 ####################################################################################################
 ##sub projects
 add_subdirectory(server)
+add_subdirectory(data)
 
 ######################################################################################################
 ##playground
