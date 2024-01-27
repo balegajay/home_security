@@ -2,7 +2,7 @@
 ## Idea
 1. Use old phones as security camera for the house
 2. Use camera stream to run object detection to look for poisonous animals (mainly snake)
-## TODOS
+## TODOs
 1. Build a tcp sever to receive radar module messages and send camera stream requests to the phones ✅
 2. Build a streaming client to receive camera streams from phones ✅ 
 3. Build a phone app to send camera stream on demand
