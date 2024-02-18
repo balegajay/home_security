@@ -2,7 +2,6 @@
 
 #include <sys/types.h>
 
-#include <algorithm>
 #include <boost/system/error_code.hpp>
 #include <cstdint>
 #include <functional>
@@ -49,5 +48,10 @@ void SessionManager::OnWriteResponse(std::vector<uint8_t> message,
   // broadcast message is sender id is 0
   for (auto [id, session] : active_sessions_) {
     session->WriteResponse(message);
+  }
+}
+void SessionManager::OnSessionType(int sender_id, SessionType type) {
+  if (active_sessions_.count(sender_id)) {
+    active_sessions_[sender_id]->type_ = type;
   }
 }

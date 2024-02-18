@@ -3,7 +3,8 @@
 #include <boost/asio.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/signals2.hpp>
-#include <unordered_set>
+
+#include "session_type.hpp"
 
 using boost::asio::ip::tcp;
 
@@ -16,6 +17,7 @@ class Session : std::enable_shared_from_this<Session> {
   int id_;
   [[nodiscard]] static std::shared_ptr<Session> Create(tcp::socket &&peer,
                                                        int id);
+  SessionType type_;
   void Read();
   void WriteResponse(std::vector<uint8_t> message);
   boost::signals2::signal<void(std::vector<uint8_t>, int)> new_message;

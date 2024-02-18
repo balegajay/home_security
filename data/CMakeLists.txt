@@ -1,2 +1,3 @@
 add_subdirectory(serializer)
 add_subdirectory(deserializer)
+add_subdirectory(common_data)

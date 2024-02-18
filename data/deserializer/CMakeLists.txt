@@ -10,4 +10,4 @@ target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURR
                                                   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
                                                   ${Boost_INCLUDE_DIRS})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC flatbuffers)
+target_link_libraries(${PROJECT_NAME} PUBLIC flatbuffers common_data)

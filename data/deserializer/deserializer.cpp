@@ -34,6 +34,21 @@ void Deserializer::ProcessMessage(std::vector<uint8_t> new_message,
         }
         break;
       }
+      case Communication::Content_Session: {
+        auto session_data = request->content_as_Session();
+        auto type = session_data->type();
+        switch (type) {
+          case Communication::SessionType_Controller:
+            session_type(sender_id, request->id(), SessionType::Controller);
+            break;
+          case Communication::SessionType_Follower:
+            session_type(sender_id, request->id(), SessionType::Follower);
+            break;
+          case Communication::SessionType_None:
+            session_type(sender_id, request->id(), SessionType::none);
+            break;
+        }
+      }
     }
   }
 }

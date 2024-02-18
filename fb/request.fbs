@@ -4,6 +4,11 @@ struct Bell {
     pressed: bool;
 }
 
+enum SessionType: byte {Controller=0, Follower, None }
+struct Session {
+    type: SessionType;
+}
+
 struct ObjectDetector {
     new_object: bool;
 }
@@ -18,7 +23,8 @@ struct Service {
 union Content {
     Bell,
     Service,
-    ObjectDetector
+    ObjectDetector,
+    Session
 }
 
 table Request{

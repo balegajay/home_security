@@ -5,6 +5,8 @@
 #include <tuple>
 #include <vector>
 
+#include "session_type.hpp"
+
 class Deserializer {
  public:
   Deserializer();
@@ -14,4 +16,6 @@ class Deserializer {
   boost::signals2::signal<void(int sender_id, int message_id,
                                std::tuple<bool, bool, bool>)>
       service_request;
+  boost::signals2::signal<void(int sender_id, int message_id, SessionType type)>
+      session_type;
 };
