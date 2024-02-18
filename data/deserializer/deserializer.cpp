@@ -1,39 +1,39 @@
 #include "deserializer.hpp"
 
-#include "fbs_generated/message_generated.h"
+#include "fbs_generated/request_generated.h"
 
-Deserializer::Deserializer(boost::asio::io_context& io_context)
-    : io_context_(io_context) {}
+Deserializer::Deserializer() {}
 
-void Deserializer::ProcessMessage(std::vector<uint8_t> new_message, int id) {
+void Deserializer::ProcessMessage(std::vector<uint8_t> new_message,
+                                  int sender_id) {
   auto verifier = flatbuffers::Verifier(new_message.data(), new_message.size());
-  if (Communication::VerifyMessageBuffer(verifier)) {
-    auto message = Communication::GetMessage(new_message.data());
-    auto content_type = message->content_type();
-    switch (content_type) {
+  if (Communication::VerifyRequestBuffer(verifier)) {
+    auto request = Communication::GetRequest(new_message.data());
+    auto request_content = request->content_type();
+    switch (request_content) {
       case Communication::Content_NONE:
         break;
-      case Communication::Content_sensor: {
-        auto sensor_data = message->content_as_sensor();
-        if (sensor_data->new_object()) new_object();
+      case Communication::Content_Bell: {
+        auto bell_data = request->content_as_Bell();
+        if (bell_data->pressed()) {
+          bell(sender_id, request->id());
+        };
         break;
       }
-      case Communication::Content_camera: {
+      case Communication::Content_Service: {
+        auto service_data = request->content_as_Service();
+        service_request(sender_id, request->id(),
+                        {service_data->camera(), service_data->mic(),
+                         service_data->speaker()});
         break;
       }
-      case Communication::Content_response: {
-        auto response_content = message->content_as_response();
-        if (response_content->value() == Communication::ResponseContent_OK)
-          response_ok(id);
-        else
-          response_nok(id);
+      case Communication::Content_ObjectDetector: {
+        auto object_detector_data = request->content_as_ObjectDetector();
+        if (object_detector_data) {
+          new_object(sender_id, request->id());
+        }
+        break;
       }
     }
   }
-}
-
-void Deserializer::OnNewMessage(std::vector<uint8_t> new_message, int id) {
-  boost::asio::post(io_context_, [this, new_message, id]() {
-    this->ProcessMessage(new_message, id);
-  });
 }

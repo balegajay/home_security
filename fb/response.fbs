@@ -1,0 +1,24 @@
+namespace Communication;
+
+enum Code:byte {
+    OK=0, ERROR=1
+}
+
+struct ResponseCode {
+    code: Code;
+}
+
+struct SomeOneAtDoor {
+    bell: bool;
+}
+
+union ResponseContent {
+    ResponseCode, SomeOneAtDoor
+}
+
+table Response {
+    id: int;
+    content: ResponseContent;
+}
+
+root_type Response;

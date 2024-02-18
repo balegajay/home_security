@@ -9,57 +9,45 @@
 #include <memory>
 #include <vector>
 
-#include "deserializer.hpp"
-#include "serializer.hpp"
-#include "session.hpp"
-
-SessionManager::SessionManager(boost::asio::io_context& io_context)
-    : io_context_(io_context),
-      deserializer_(std::make_shared<Deserializer>(io_context)),
-      serializer_(std::make_shared<Serializer>()) {
+SessionManager::SessionManager() {
   // connect to signals from session manager
-  message.connect(std::bind(&Deserializer::OnNewMessage, deserializer_.get(),
-                            std::placeholders::_1, std::placeholders::_2));
-
-  camera_start_message_ = serializer_->GetCameraStartMessage();
-  camera_stop_message_ = serializer_->GetCameraStopMessage();
 }
-
-void SessionManager::OnNewObject() { BroadCast(camera_start_message_); }
 
 void SessionManager::AddSession(tcp::socket&& peer) {
   // some hack to get the hash, need to find a better way
   std::shared_ptr<Session> new_session;
   auto session_hash = std::hash<std::shared_ptr<Session>>{}(new_session);
+
   new_session = Session::Create(std::move(peer), session_hash);
-  new_session->new_message.connect(std::bind(&SessionManager::OnRead, this,
-                                             std::placeholders::_1,
+
+  new_session->new_message.connect(std::bind(&SessionManager::OnNewMessage,
+                                             this, std::placeholders::_1,
                                              std::placeholders::_2));
   new_session->session_error.connect(std::bind(&SessionManager::OnSessionError,
                                                this, std::placeholders::_1,
                                                std::placeholders::_2));
-  deserializer_->response_ok.connect(std::bind(
-      &Session::OnResponseOK, new_session.get(), std::placeholders::_1));
-  deserializer_->response_nok.connect(std::bind(
-      &Session::OnResponseNOK, new_session.get(), std::placeholders::_1));
-  active_sessions_.insert(new_session);
+
+  active_sessions_[session_hash] = new_session;
 }
 
-void SessionManager::OnRead(std::vector<uint8_t> new_message, int id) {
-  message(new_message, id);
+void SessionManager::OnNewMessage(std::vector<uint8_t> new_message,
+                                  int session_id) {
+  if (active_sessions_.count(session_id)) message(new_message, session_id);
 }
 
 void SessionManager::OnSessionError(boost::system::error_code err, int id) {
   // TODO handle all errors
-  auto it = std::find_if(
-      active_sessions_.begin(), active_sessions_.end(),
-      [id](std::shared_ptr<Session> session) { return session->id_ == id; });
-  if (it != active_sessions_.end()) active_sessions_.erase(it);
+  active_sessions_.erase(id);
 }
 
-void SessionManager::BroadCast(std::vector<uint8_t> message) {
-  std::for_each(active_sessions_.begin(), active_sessions_.end(),
-                [this, &message](std::shared_ptr<Session> session) {
-                  session->Write(message);
-                });
+void SessionManager::OnWriteResponse(std::vector<uint8_t> message,
+                                     int sender_id) {
+  if (sender_id && active_sessions_.count(sender_id)) {
+    active_sessions_[sender_id]->WriteResponse(message);
+    return;
+  }
+  // broadcast message is sender id is 0
+  for (auto [id, session] : active_sessions_) {
+    session->WriteResponse(message);
+  }
 }

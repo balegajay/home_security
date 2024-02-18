@@ -7,7 +7,15 @@
 TCPServer::TCPServer(uint16_t port)
     : io_context_(),
       acceptor_(io_context_, tcp::endpoint(tcp::v4(), port)),
-      session_manager_(io_context_) {}
+      session_manager_(),
+      message_handler_(io_context_) {
+  session_manager_.message.connect(
+      std::bind(&MessageHandler::OnNewMessage, &message_handler_,
+                std::placeholders::_1, std::placeholders::_2));
+  message_handler_.write_response.connect(
+      std::bind(&SessionManager::OnWriteResponse, &session_manager_,
+                std::placeholders::_1, std::placeholders::_2));
+}
 
 TCPServer::~TCPServer() {}
 

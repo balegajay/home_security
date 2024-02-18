@@ -1,0 +1,29 @@
+namespace Communication;
+
+struct Bell {
+    pressed: bool;
+}
+
+struct ObjectDetector {
+    new_object: bool;
+}
+
+enum Status:byte { Stop=0, Start}
+struct Service {
+    camera: Status;
+    mic: Status;
+    speaker: Status;
+}
+
+union Content {
+    Bell,
+    Service,
+    ObjectDetector
+}
+
+table Request{
+    id: int;
+    content: Content;
+}
+
+root_type Request;
