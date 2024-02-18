@@ -36,6 +36,7 @@ void SessionManager::OnNewMessage(std::vector<uint8_t> new_message,
 
 void SessionManager::OnSessionError(boost::system::error_code err, int id) {
   // TODO handle all errors
+  session_removed(active_sessions_[id]->metadata_);
   active_sessions_.erase(id);
 }
 
@@ -50,8 +51,10 @@ void SessionManager::OnWriteResponse(std::vector<uint8_t> message,
     session->WriteResponse(message);
   }
 }
-void SessionManager::OnSessionType(int sender_id, SessionType type) {
+void SessionManager::OnSessionMetaData(int sender_id,
+                                       SessionMetaData metadata) {
   if (active_sessions_.count(sender_id)) {
-    active_sessions_[sender_id]->type_ = type;
+    session_metadata_changed(active_sessions_[sender_id]->metadata_, metadata);
+    active_sessions_[sender_id]->metadata_ = metadata;
   }
 }

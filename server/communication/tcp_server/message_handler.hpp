@@ -23,12 +23,12 @@ class MessageHandler {
   void OnNewMessage(std::vector<uint8_t> message, int sender_id);
   void OnNewObject(int sender_id, int message_id);
   void OnBell(int sender_id, int message_id);
-  void OnSessionType(int sender_id, int message_id, SessionType session_type);
+  void OnSessionType(int sender_id, int message_id, SessionMetaData type);
   void OnServiceRequest(int sender_id, int message_id,
                         std::tuple<bool, bool, bool> status);
   void SendOkMessage(int sender_id, int message_id);
   boost::signals2::signal<void(std::vector<uint8_t> message, int sender_id)>
       write_response;
-  boost::signals2::signal<void(int sender_id, SessionType session_type)>
-      session_type;
+  boost::signals2::signal<void(int sender_id, SessionMetaData metadata)>
+      session_metadata;
 };

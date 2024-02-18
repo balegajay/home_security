@@ -16,6 +16,7 @@ class Deserializer {
   boost::signals2::signal<void(int sender_id, int message_id,
                                std::tuple<bool, bool, bool>)>
       service_request;
-  boost::signals2::signal<void(int sender_id, int message_id, SessionType type)>
-      session_type;
+  boost::signals2::signal<void(int sender_id, int message_id,
+                               SessionMetaData type)>
+      session_metadata;
 };

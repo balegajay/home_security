@@ -14,7 +14,7 @@ MessageHandler::MessageHandler(boost::asio::io_context& io_context)
   deserializer_->new_object.connect(std::bind(&MessageHandler::OnNewObject,
                                               this, std::placeholders::_1,
                                               std::placeholders::_2));
-  deserializer_->session_type.connect(
+  deserializer_->session_metadata.connect(
       std::bind(&MessageHandler::OnSessionType, this, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3));
 }
@@ -38,9 +38,9 @@ void MessageHandler::OnBell(int sender_id, int message_id) {
 }
 
 void MessageHandler::OnSessionType(int sender_id, int message_id,
-                                   SessionType type) {
+                                   SessionMetaData metadata) {
   SendOkMessage(sender_id, message_id);
-  session_type(sender_id, type);
+  session_metadata(sender_id, metadata);
 }
 
 void MessageHandler::OnServiceRequest(int sender_id, int message_id,

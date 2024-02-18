@@ -11,8 +11,8 @@ TCPServer::TCPServer(uint16_t port)
   message_handler_.write_response.connect(
       std::bind(&SessionManager::OnWriteResponse, &session_manager_,
                 std::placeholders::_1, std::placeholders::_2));
-  message_handler_.session_type.connect(
-      std::bind(&SessionManager::OnSessionType, &session_manager_,
+  message_handler_.session_metadata.connect(
+      std::bind(&SessionManager::OnSessionMetaData, &session_manager_,
                 std::placeholders::_1, std::placeholders::_2));
 }
 

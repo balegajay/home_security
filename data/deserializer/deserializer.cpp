@@ -35,19 +35,22 @@ void Deserializer::ProcessMessage(std::vector<uint8_t> new_message,
         break;
       }
       case Communication::Content_Session: {
+        SessionMetaData metadata;
         auto session_data = request->content_as_Session();
         auto type = session_data->type();
         switch (type) {
           case Communication::SessionType_Controller:
-            session_type(sender_id, request->id(), SessionType::Controller);
+            metadata.type_ = SessionMetaData::Controller;
             break;
           case Communication::SessionType_Follower:
-            session_type(sender_id, request->id(), SessionType::Follower);
+            metadata.type_ = SessionMetaData::Follower;
             break;
           case Communication::SessionType_None:
-            session_type(sender_id, request->id(), SessionType::none);
+            metadata.type_ = SessionMetaData::none;
             break;
         }
+        metadata.streaming_ip = session_data->streaming_ip()->str();
+        session_metadata(sender_id, request->id(), metadata);
       }
     }
   }

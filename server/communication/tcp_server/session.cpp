@@ -1,7 +1,7 @@
 #include "session.hpp"
 
 Session::Session(tcp::socket &&peer, int id)
-    : peer_(std::move(peer)), id_(id), type_(SessionType::none) {}
+    : peer_(std::move(peer)), id_(id), metadata_() {}
 
 std::shared_ptr<Session> Session::Create(tcp::socket &&peer, int id) {
   return std::make_shared<Session>(std::move(peer), id);

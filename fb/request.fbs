@@ -5,8 +5,9 @@ struct Bell {
 }
 
 enum SessionType: byte {Controller=0, Follower, None }
-struct Session {
+table Session {
     type: SessionType;
+    streaming_ip: string;
 }
 
 struct ObjectDetector {

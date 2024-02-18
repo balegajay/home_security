@@ -17,7 +17,7 @@ class Session : std::enable_shared_from_this<Session> {
   int id_;
   [[nodiscard]] static std::shared_ptr<Session> Create(tcp::socket &&peer,
                                                        int id);
-  SessionType type_;
+  SessionMetaData metadata_;
   void Read();
   void WriteResponse(std::vector<uint8_t> message);
   boost::signals2::signal<void(std::vector<uint8_t>, int)> new_message;
