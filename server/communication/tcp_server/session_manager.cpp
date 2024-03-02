@@ -1,12 +1,6 @@
 #include "session_manager.hpp"
 
-#include <sys/types.h>
-
-#include <boost/system/error_code.hpp>
-#include <cstdint>
-#include <functional>
-#include <memory>
-#include <vector>
+#include "session.hpp"
 
 SessionManager::SessionManager() {
   // connect to signals from session manager

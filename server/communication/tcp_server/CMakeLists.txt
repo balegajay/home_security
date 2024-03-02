@@ -9,5 +9,6 @@ add_library(${PROJECT_NAME} tcp_server.cpp session.cpp session_manager.cpp)
 ####################################################################################################
 ##dependencies
 find_package(Boost REQUIRED)
-target_include_directories(${PROJECT_NAME} PUBLIC ${Boost_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+                                                  ${Boost_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE deserializer serializer common_data)

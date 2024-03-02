@@ -1,7 +1,6 @@
 #pragma once
 
 #include <boost/asio.hpp>
-#include <boost/asio/ip/tcp.hpp>
 #include <boost/signals2.hpp>
 
 #include "session_type.hpp"

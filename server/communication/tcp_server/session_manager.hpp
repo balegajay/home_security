@@ -1,13 +1,14 @@
 #include <boost/asio.hpp>
 #include <boost/signals2.hpp>
 #include <boost/system/error_code.hpp>
-#include <cstdint>
 #include <memory>
 #include <unordered_map>
 #include <vector>
 
-#include "session.hpp"
 #include "session_type.hpp"
+
+using boost::asio::ip::tcp;
+class Session;
 
 class SessionManager {
  private:
