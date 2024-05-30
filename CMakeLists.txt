@@ -6,7 +6,7 @@ include(cmake/fetchFlatBuffers.cmake)
 ##dependencies
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/fbs_generated)
 
-set(flatc_command ${FLATC_DIR} --cpp ${CMAKE_SOURCE_DIR}/fb/request.fbs ${CMAKE_SOURCE_DIR}/fb/response.fbs)
+set(flatc_command ${FLATC_DIR} --cpp ${CMAKE_SOURCE_DIR}/fb/message.fbs)
 
 execute_process(
     COMMAND ${flatc_command}

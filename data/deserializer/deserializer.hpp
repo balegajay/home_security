@@ -5,18 +5,14 @@
 #include <tuple>
 #include <vector>
 
-#include "session_type.hpp"
+#include "notifications.hpp"
+#include "request.hpp"
 
 class Deserializer {
  public:
   Deserializer();
-  void ProcessMessage(std::vector<uint8_t> new_message, int id);
-  boost::signals2::signal<void(int sender_id, int message_id)> new_object;
-  boost::signals2::signal<void(int sender_id, int message_id)> bell;
-  boost::signals2::signal<void(int sender_id, int message_id,
-                               std::tuple<bool, bool, bool>)>
-      service_request;
-  boost::signals2::signal<void(int sender_id, int message_id,
-                               SessionMetaData type)>
-      session_metadata;
+  void ProcessMessage(std::vector<uint8_t> new_message);
+  boost::signals2::signal<void(int, Notification)> new_notification;
+  boost::signals2::signal<void(int)> heartbeat;
+  boost::signals2::signal<void(int, Request)> new_request;
 };

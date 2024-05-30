@@ -1,19 +1,13 @@
 #include "tcp_server.hpp"
 
-TCPServer::TCPServer(uint16_t port)
-    : io_context_(),
-      acceptor_(io_context_, tcp::endpoint(tcp::v4(), port)),
-      session_manager_(),
-      message_handler_(io_context_) {
-  session_manager_.message.connect(
-      std::bind(&MessageHandler::OnNewMessage, &message_handler_,
-                std::placeholders::_1, std::placeholders::_2));
-  message_handler_.write_response.connect(
-      std::bind(&SessionManager::OnWriteResponse, &session_manager_,
-                std::placeholders::_1, std::placeholders::_2));
-  message_handler_.session_metadata.connect(
-      std::bind(&SessionManager::OnSessionMetaData, &session_manager_,
-                std::placeholders::_1, std::placeholders::_2));
+#include <iostream>
+
+TCPServer::TCPServer(uint16_t port, boost::asio::io_context& io_context)
+    : io_context_(io_context),
+      acceptor_(io_context_, tcp::endpoint(tcp::v4(), port)) {
+  session_manager_.new_notification.connect([](Notification notification) {
+    std::cout << "Received notification: " << notification << std::endl;
+  });
 }
 
 TCPServer::~TCPServer() {}
@@ -27,9 +21,9 @@ void TCPServer::StartAsync() {
 void TCPServer::StartAccept() {
   acceptor_.async_accept(
       io_context_,
-      [this](const boost::system::error_code &err, tcp::socket peer) {
+      [this](const boost::system::error_code& err, tcp::socket peer) {
         if (!err) {
-          session_manager_.AddSession(std::move(peer));
+          session_manager_.OnNewSession(std::move(peer));
         }
       });
 }

@@ -1,0 +1,37 @@
+namespace Communication;
+
+enum NotificationType: byte {
+    Bell,
+    Object
+}
+
+struct Notification {
+    notification : NotificationType;
+}
+
+struct Request {
+    audio_feed: bool;
+    video_feed: bool;
+}  
+
+struct Response {
+    status: bool;
+}
+
+struct Heartbeat {
+    alive: bool;
+}
+
+union Content {
+    Notification,
+    Request,
+    Response,
+    Heartbeat
+}
+
+table Message{
+    id: int;
+    content: Content;
+}
+
+root_type Message;

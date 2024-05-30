@@ -27,7 +27,7 @@ find_package(Boost REQUIRED)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${OpenCV_INCLUDE_DIRS} ${TORCH_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${OpenCV_LIBS} Inference streamer)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${OpenCV_LIBS} Inference streamer tcp_server common_data)
 target_link_libraries(${PROJECT_NAME} PRIVATE flatbuffers)
 ####################################################################################################
 ##sub projects

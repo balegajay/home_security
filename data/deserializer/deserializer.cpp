@@ -1,56 +1,44 @@
 #include "deserializer.hpp"
 
-#include "fbs_generated/request_generated.h"
+#include <iostream>
+
+#include "fbs_generated/message_generated.h"
 
 Deserializer::Deserializer() {}
 
-void Deserializer::ProcessMessage(std::vector<uint8_t> new_message,
-                                  int sender_id) {
+void Deserializer::ProcessMessage(std::vector<uint8_t> new_message) {
   auto verifier = flatbuffers::Verifier(new_message.data(), new_message.size());
-  if (Communication::VerifyRequestBuffer(verifier)) {
-    auto request = Communication::GetRequest(new_message.data());
-    auto request_content = request->content_type();
-    switch (request_content) {
-      case Communication::Content_NONE:
-        break;
-      case Communication::Content_Bell: {
-        auto bell_data = request->content_as_Bell();
-        if (bell_data->pressed()) {
-          bell(sender_id, request->id());
-        };
+
+  if (Communication::VerifyMessageBuffer(verifier)) {
+    auto message = Communication::GetMessage(new_message.data());
+
+    switch (message->content_type()) {
+      case Communication::Content_NONE: {
+        std::cout << "error with message content type" << std::endl;
         break;
       }
-      case Communication::Content_Service: {
-        auto service_data = request->content_as_Service();
-        service_request(sender_id, request->id(),
-                        {service_data->camera(), service_data->mic(),
-                         service_data->speaker()});
+      case Communication::Content_Notification: {
+        auto notification = message->content_as_Notification();
+        new_notification(message->id(), static_cast<Notification>(
+                                            notification->notification()));
         break;
       }
-      case Communication::Content_ObjectDetector: {
-        auto object_detector_data = request->content_as_ObjectDetector();
-        if (object_detector_data) {
-          new_object(sender_id, request->id());
-        }
+      case Communication::Content_Request: {
+        auto request = message->content_as_Request();
+        if (request->audio_feed() && request->video_feed())
+          new_request(message->id(), AVFeed);
+        else if (request->audio_feed())
+          new_request(message->id(), AudioFeed);
+        else if (request->video_feed())
+          new_request(message->id(), VideoFeed);
         break;
       }
-      case Communication::Content_Session: {
-        SessionMetaData metadata;
-        auto session_data = request->content_as_Session();
-        auto type = session_data->type();
-        switch (type) {
-          case Communication::SessionType_Controller:
-            metadata.type_ = SessionMetaData::Controller;
-            break;
-          case Communication::SessionType_Follower:
-            metadata.type_ = SessionMetaData::Follower;
-            break;
-          case Communication::SessionType_None:
-            metadata.type_ = SessionMetaData::none;
-            break;
-        }
-        metadata.streaming_ip = session_data->streaming_ip()->str();
-        session_metadata(sender_id, request->id(), metadata);
+      case Communication::Content_Response: {
+        break;
+      }
+      case Communication::Content_Heartbeat: {
+        heartbeat(message->id());
+        break;
       }
     }
   }

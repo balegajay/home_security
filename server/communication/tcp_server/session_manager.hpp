@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "session_type.hpp"
+#include "notifications.hpp"
 
 using boost::asio::ip::tcp;
 class Session;
@@ -17,14 +17,9 @@ class SessionManager {
 
  public:
   SessionManager();
-  void AddSession(tcp::socket&& peer);
-  void OnNewMessage(std::vector<uint8_t> message, int session_id);
+  void OnNewSession(tcp::socket&& peer);
+  boost::signals2::signal<void(Notification)> new_notification;
   void OnSessionError(boost::system::error_code err, int id);
   void BroadCast(std::vector<uint8_t> message);
   void OnWriteResponse(std::vector<uint8_t> message, int sender_id);
-  void OnSessionMetaData(int sender_id, SessionMetaData metadata);
-  boost::signals2::signal<void(std::vector<uint8_t>, int)> message;
-  boost::signals2::signal<void(SessionMetaData)> session_removed;
-  boost::signals2::signal<void(SessionMetaData, SessionMetaData)>
-      session_metadata_changed;
 };
