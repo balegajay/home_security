@@ -12,3 +12,11 @@
 6. Based on radar signals ask the udp clients (phones) to send camera stream
 ## Architecture
 ![Architecture](architecture.excalidraw.png)
+
+### feature planing
+1. Camera feed (Only video)
+2. Add audio feed
+3. Integrate calling bell
+4. Human detection
+5. Animal detection
+
