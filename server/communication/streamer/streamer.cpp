@@ -108,8 +108,7 @@ class Impl {
   }
 };
 
-Streamer::Streamer(int argc, char *argv[], int video_port, int audio_port)
-    : video_port_(video_port), audio_port_(audio_port) {
+Streamer::Streamer(int argc, char *argv[]) {
   /* Initialize GStreamer */
   gst_init(&argc, &argv);
   impl_data_ = new Impl();
@@ -118,18 +117,11 @@ Streamer::Streamer(int argc, char *argv[], int video_port, int audio_port)
 
 Streamer::~Streamer() {}
 
-bool Streamer::Setup() {
+bool Streamer::Setup(std::string pipeline) {
   /* Create the pipeline*/
   impl_data_->pipeline =
       std::unique_ptr<GstElement, decltype(&gst_object_unref)>(
-          gst_parse_launch(
-              "gst-launch-1.0 -v udpsrc port=5000 ! application/x-rtp, "
-              "media=(string)video, clock-rate=(int)90000, "
-              "encoding-name=(string)H264, payload=(int)96 ! rtph264depay ! "
-              "h264parse ! avdec_h264 ! tee name=t ! queue ! videoconvert ! "
-              "autovideosink t. ! queue ! videoconvert ! "
-              "video/x-raw,format=RGBA ! appsink name=sink",
-              nullptr),
+          gst_parse_launch(pipeline.c_str(), nullptr),
           gst_object_unref);
 
   /* Start playing */
