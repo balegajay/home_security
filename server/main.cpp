@@ -2,7 +2,7 @@
 #include <boost/signals2/signal.hpp>
 #include <iostream>
 
-#include "IInference.hpp"
+// #include "IInference.hpp"
 #include "streamer.hpp"
 #include "tcp_server.hpp"
 
