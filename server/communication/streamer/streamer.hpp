@@ -13,7 +13,7 @@ class Streamer {
  public:
   Streamer(int argc, char* argv[]);
   ~Streamer();
-  bool Setup();
+  bool Setup(std::string pipeline);
   bool Pause();
   void Start();
   boost::signals2::signal<void(cv::Mat)> new_img;

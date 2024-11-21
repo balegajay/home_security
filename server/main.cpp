@@ -24,17 +24,9 @@ int main(int argc, char *argv[]) {
   // std::unique_ptr<IInference> inferencer =
   //     std::make_unique<TorchInference>("best.torchscript", "");
 
-  // create the streamer to get images from the clients
-  Streamer streamer(argc, argv, 5000, 1);
-  streamer.Setup();
-
-  // connect to the new image signal from the client
-  streamer.new_img.connect([/*&inferencer*/](cv::Mat img) {
-    // get the model results for the image (model inferencing has a lot of
-    // errors)
-    // inferencer->Infer(img);
-    // TODO use the results in an alert system
-  });
+  // streamer client needs to be created for every streaming server
+  Streamer streamer(argc, argv);
+  streamer.Setup("gst-launch-1.0 -v udpsrc port=5000 ! application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264, payload=(int)96 ! rtph264depay ! h264parse ! tee name=t t. ! queue ! splitmuxsink max-size-time=86400000000000 location=recording%02d.mp4 -e t. ! queue leaky=1 ! decodebin ! videoconvert ! autovideosink sync=false");
 
   // start the streamer
   streamer.Start();
