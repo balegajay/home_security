@@ -15,10 +15,10 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/detector/models/ DESTINATION bin)
 
 find_package(OpenCV REQUIRED)
 
-set(TORCH_DIR ${CMAKE_CURRENT_SOURCE_DIR}/deps/torch/)
-file(ARCHIVE_EXTRACT INPUT ${TORCH_DIR}/libtorch-cxx11-abi-shared-with-deps-latest.zip DESTINATION ${TORCH_DIR})
+# set(TORCH_DIR ${CMAKE_CURRENT_SOURCE_DIR}/deps/torch/)
+# file(ARCHIVE_EXTRACT INPUT ${TORCH_DIR}/libtorch-cxx11-abi-shared-with-deps-latest.zip DESTINATION ${TORCH_DIR})
 
-find_package(Torch REQUIRED PATHS ${TORCH_DIR}/libtorch/share/cmake/Torch)
+# find_package(Torch REQUIRED PATHS ${TORCH_DIR}/libtorch/share/cmake/Torch)
 
 set(Boost_USE_STATIC_LIBS OFF) 
 set(Boost_USE_MULTITHREADED ON)  
@@ -27,11 +27,11 @@ find_package(Boost REQUIRED)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${OpenCV_INCLUDE_DIRS} ${TORCH_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${OpenCV_LIBS} Inference streamer tcp_server common_data)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${OpenCV_LIBS} streamer tcp_server common_data)
 target_link_libraries(${PROJECT_NAME} PRIVATE flatbuffers)
 ####################################################################################################
 ##sub projects
-add_subdirectory(detector/inference)
+# add_subdirectory(detector/inference)
 add_subdirectory(communication)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
