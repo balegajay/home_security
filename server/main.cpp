@@ -10,10 +10,10 @@ int main(int argc, char *argv[]) {
 #ifdef APP_VERSION
   std::cout << APP_VERSION << std::endl;
 #endif
-  boost::asio::io_context sever_context;
-  // setup for tcp_server
-  TCPServer server(3000, sever_context);
-  server.StartAsync();
+  // boost::asio::io_context sever_context;
+  // // setup for tcp_server
+  // TCPServer server(3000, sever_context);
+  // server.StartAsync();
 
   // create the inferencer
   // std::unique_ptr<IInference> inferencer =
