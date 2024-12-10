@@ -3,3 +3,4 @@ build/
 install/
 .vscode/
 server/deps/torch/libtorch/
+client/CMakeLists.txt.user

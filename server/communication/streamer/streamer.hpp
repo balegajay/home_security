@@ -8,11 +8,9 @@ class Impl;
 
 class Streamer {
   Impl* impl_data_;
-  int video_port_;
-  int audio_port_;
 
  public:
-  Streamer(int argc, char* argv[], int video_port, int audio_port);
+  Streamer(int argc, char* argv[]);
   ~Streamer();
   bool Setup(std::string pipeline);
   bool Pause();

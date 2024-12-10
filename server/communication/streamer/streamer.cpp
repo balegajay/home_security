@@ -67,8 +67,7 @@ class Impl {
 
 };
 
-Streamer::Streamer(int argc, char *argv[], int video_port, int audio_port)
-    : video_port_(video_port), audio_port_(audio_port) {
+Streamer::Streamer(int argc, char *argv[]) {
   /* Initialize GStreamer */
   gst_init(&argc, &argv);
   impl_data_ = new Impl();
@@ -82,8 +81,7 @@ bool Streamer::Setup(std::string pipeline) {
   /* Create the pipeline*/
   impl_data_->pipeline =
       std::unique_ptr<GstElement, decltype(&gst_object_unref)>(
-          gst_parse_launch(pipeline.c_str(),
-              nullptr),
+          gst_parse_launch(pipeline.c_str(), nullptr),
           gst_object_unref);
 
   /* Start playing */
