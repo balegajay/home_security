@@ -32,8 +32,6 @@ class Impl {
       std::unique_ptr<GstElement, decltype(&gst_object_unref)>(
           nullptr, gst_object_unref);
 
-  boost::signals2::signal<void(cv::Mat)> new_img;
-
   ~Impl() {
     /* Free resources */
     gst_element_set_state(pipeline.get(), GST_STATE_NULL);
@@ -67,45 +65,6 @@ class Impl {
     if (object) object->BusMessageHandler(bus, msg, object);
   }
 
-  GstFlowReturn NewSampleHandler(GstElement *appsink, Impl *udata) {
-    std::unique_ptr<GstSample, decltype(&gst_sample_unref)> sample(
-        gst_app_sink_pull_sample((GstAppSink *)appsink), &gst_sample_unref);
-
-    if (!sample) {
-      std::cout << "No sample" << std::endl;
-      return GST_FLOW_CUSTOM_ERROR;
-    }
-
-    auto caps = gst_sample_get_caps(sample.get());
-    if (!caps) {
-      std::cout << "No caps" << std::endl;
-      return GST_FLOW_CUSTOM_ERROR;
-    }
-
-    auto structure = gst_caps_get_structure(caps, 0);
-    if (!structure) {
-      std::cout << "No structure" << std::endl;
-      return GST_FLOW_CUSTOM_ERROR;
-    }
-
-    int height, width;
-    gst_structure_get_int(structure, "width", &width);
-    gst_structure_get_int(structure, "height", &height);
-
-    auto sample_buffer = gst_sample_get_buffer(sample.get());
-    GstMapInfo map;
-    gst_buffer_map(sample_buffer, &map, GST_MAP_READ);
-    if (!map.data) std::cout << "errorasdc" << std::endl;
-
-    cv::Mat img(height, width, CV_8UC4, (char *)map.data);
-    new_img(img);
-    gst_buffer_unmap(sample_buffer, &map);
-    return GST_FLOW_OK;
-  }
-
-  static GstFlowReturn NewSampleHandlerCB(GstElement *appsink, Impl *udata) {
-    return udata->NewSampleHandler(appsink, udata);
-  }
 };
 
 Streamer::Streamer(int argc, char *argv[], int video_port, int audio_port)
@@ -113,22 +72,17 @@ Streamer::Streamer(int argc, char *argv[], int video_port, int audio_port)
   /* Initialize GStreamer */
   gst_init(&argc, &argv);
   impl_data_ = new Impl();
-  impl_data_->new_img.connect(new_img);
 }
 
-Streamer::~Streamer() {}
+Streamer::~Streamer() {
+  delete impl_data_;
+}
 
-bool Streamer::Setup() {
+bool Streamer::Setup(std::string pipeline) {
   /* Create the pipeline*/
   impl_data_->pipeline =
       std::unique_ptr<GstElement, decltype(&gst_object_unref)>(
-          gst_parse_launch(
-              "gst-launch-1.0 -v udpsrc port=5000 ! application/x-rtp, "
-              "media=(string)video, clock-rate=(int)90000, "
-              "encoding-name=(string)H264, payload=(int)96 ! rtph264depay ! "
-              "h264parse ! avdec_h264 ! tee name=t ! queue ! videoconvert ! "
-              "autovideosink t. ! queue ! videoconvert ! "
-              "video/x-raw,format=RGBA ! appsink name=sink",
+          gst_parse_launch(pipeline.c_str(),
               nullptr),
           gst_object_unref);
 
@@ -146,16 +100,6 @@ bool Streamer::Setup() {
   gst_bus_add_signal_watch(impl_data_->bus.get());
   g_signal_connect(impl_data_->bus.get(), "message",
                    G_CALLBACK(impl_data_->BusMessageHandlerCB), impl_data_);
-
-  impl_data_->sink = std::unique_ptr<GstElement, decltype(&gst_object_unref)>(
-      gst_bin_get_by_name(GST_BIN(impl_data_->pipeline.get()), "sink"),
-      gst_object_unref);
-
-  g_object_set(impl_data_->sink.get(), "emit-signals", TRUE, NULL);
-
-  /* connect to signals from sink*/
-  g_signal_connect(impl_data_->sink.get(), "new-sample",
-                   G_CALLBACK(impl_data_->NewSampleHandlerCB), impl_data_);
 
   return true;
 }
